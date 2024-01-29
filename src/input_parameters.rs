@@ -17,16 +17,16 @@ pub const T_END: u32 = 30; // Time when simulation ends in s
 pub const T_STEP: f32 = 0.01; // Time step in s
 pub const MAX_ITERATIONS: u32 = 20; // Newton iterations upper limit
 pub const N_INTEGRATION_POINTS: u32 = 0; // 1-d simulation, integration points are unnecessary
-pub const N_ELEMENTS: u32 = 10; // NUmber of elements in mesh. 
-static MULT: f64 = E/((1.0+NU)*(1.0-2.0*NU));
+pub const N_ELEMENTS: u32 = 10; // NUmber of elements in mesh.
+static MULT: f64 = E / ((1.0 + NU) * (1.0 - 2.0 * NU));
 
 lazy_static! {
     pub static ref C: Array2<f64> = {
-        Array2::from_shape_fn((2,2), |(i,j)| match (i,j) {
-            (0,0) => MULT * (1.0-NU),
-            (0,1) => MULT * NU,
-            (1,0) => MULT * NU,
-            (1,1) => MULT * (1.0-NU),
+        Array2::from_shape_fn((2, 2), |(i, j)| match (i, j) {
+            (0, 0) => MULT * (1.0 - NU),
+            (0, 1) => MULT * NU,
+            (1, 0) => MULT * NU,
+            (1, 1) => MULT * (1.0 - NU),
             _ => unreachable!(),
         })
     };

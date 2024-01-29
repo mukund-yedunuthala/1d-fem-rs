@@ -1,8 +1,11 @@
 extern crate ndarray;
 // Imports
-pub mod input_parameters;
 mod analytical_solution;
+mod element_routine;
+pub mod input_parameters;
+mod material_routine;
 mod mesh_generator;
+mod solver;
 fn main() {
     let _radial_nodes: Vec<f64> = mesh_generator::generate();
     println!("The nodes are: {:?}", _radial_nodes);
