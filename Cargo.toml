@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 lazy_static = "1.4.0"
-ndarray = "0.15.6"
+ndarray = { version = "0.15.6", features = ["blas"] }
+blas-src = { version = "0.10.0", default-features = false, features = ["openblas"] }
+ndarray-linalg = { version = "0.16", features = ["openblas-static"] }
