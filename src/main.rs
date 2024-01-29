@@ -1,10 +1,11 @@
+extern crate ndarray;
 // Imports
-mod input_parameters;
+pub mod input_parameters;
 mod analytical_solution;
-
-use analytical_solution::*;
-
+mod mesh_generator;
 fn main() {
-    // println!("Hello, world!");
-    analytical_solution::compute();
+    let _radial_nodes: Vec<f64> = mesh_generator::generate();
+    println!("The nodes are: {:?}", _radial_nodes);
+    let _exact_solution: Vec<f64> = analytical_solution::compute(_radial_nodes);
+    println!("The exact displacements are: {:?}", _exact_solution);
 }

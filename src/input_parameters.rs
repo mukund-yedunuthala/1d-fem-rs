@@ -1,11 +1,11 @@
 extern crate lazy_static;
-extern crate ndarray;
+// extern crate ndarray;
 
 use lazy_static::lazy_static;
 use ndarray::Array2;
 
 pub const INNER_RADIUS: u32 = 60; //mm
-pub const OUTER_RADIUS: u32 = 10; //mm
+pub const OUTER_RADIUS: u32 = 120; //mm
 pub const E: f64 = 7e4; // Mpa
 pub const NU: f64 = 0.3; // Poisson's ratio
 pub const Q: f64 = 35000.0; // Bulk modulus
