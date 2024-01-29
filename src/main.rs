@@ -11,4 +11,5 @@ fn main() {
     println!("The nodes are: {:?}", _radial_nodes);
     let _exact_solution: Vec<f64> = analytical_solution::compute(_radial_nodes);
     println!("The exact displacements are: {:?}", _exact_solution);
+    solver::solver();
 }
