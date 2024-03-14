@@ -42,9 +42,7 @@ pub fn solver(mat_size: usize, radial_nodes: Vec<f64>, connectivity: HashMap<u32
         let mut newton_iterations: u32 = 0;
         while newton_iterations <= MAX_ITERATIONS {
             // NEWTON LOOP
-            let mut e_stiffness: Array2<f64> = Array2::zeros((2, 2));
             let mut g_stiffness: Array2<f64> = Array2::zeros((mat_size + 1, mat_size + 1));
-            let mut e_forces: Array1<f64> = Array1::zeros(2);
             let mut g_int_forces: Array1<f64> = Array1::zeros(mat_size + 1);
             let mut g_ext_forces: Array1<f64> = Array1::zeros(mat_size + 1);
             let mut delta_u: Array1<f64> = Array1::zeros(mat_size + 1);
@@ -52,6 +50,8 @@ pub fn solver(mat_size: usize, radial_nodes: Vec<f64>, connectivity: HashMap<u32
             let mut sigma_evolution: Vec<Array1<f64>> = Vec::new();
             // Element routine
             for element in 0..(mat_size) {
+                let mut e_stiffness: Array2<f64> = Array2::zeros((2, 2));
+                let mut e_forces: Array1<f64> = Array1::zeros(2);
                 let r1 = radial_nodes[element];
                 let r2 = radial_nodes[element + 1];
                 let mut r_nodes: Array1<f64> = Array1::zeros(2);
@@ -114,23 +114,31 @@ pub fn solver(mat_size: usize, radial_nodes: Vec<f64>, connectivity: HashMap<u32
                 let nodes_tuple = connectivity.get(&c_index).unwrap();
                 let (start, end) = *nodes_tuple;
                 let g_int_slice = &mut g_int_forces.slice_mut(s![start..end+1]);
-                // println!("{:?}",*g_int_slice)
+                let g_stiffness_slice = &mut g_stiffness.slice_mut(s![start..end+1,start..end+1]);
                 *g_int_slice += &e_forces;
+                *g_stiffness_slice += &e_stiffness;
             } // End element routine
               // Solver
-            let g_forces: Array1<f64> = g_ext_forces - g_int_forces;
+            let g_forces: Array1<f64> = g_ext_forces.clone() - g_int_forces.clone();
+            newton_iterations += 1;
             match g_stiffness.solve(&g_forces) {
                 Ok(x) => {
                     delta_u = x;
                     for (u, &del_u) in g_displacements.iter_mut().zip(delta_u.iter()) {
                         *u += del_u;
                     }
+                    println!("{:?}", delta_u);
+                    newton_iterations+=1;
+                    g_displacements += &delta_u;
                     pl_disp = delta_u.clone();
-                    // Newton convergence criteria
-                    if 2 > 0 {
-                    } else {
-                        newton_iterations += 1;
-                    }
+                    // println!("Residual norm: {:?}", -g_forces.norm());
+                    // // Newton convergence criteria
+                    // if -g_forces.norm() < 1E-04 {    
+                    //     println!("Total newton iterations: {:?}", newton_iterations);                    
+                    //     break
+                    // } else {
+                    //     newton_iterations+=1;
+                    // }
                 }
                 Err(e) => {
                     panic!("Panic. Error: {}", e);
@@ -140,4 +148,5 @@ pub fn solver(mat_size: usize, radial_nodes: Vec<f64>, connectivity: HashMap<u32
         displacement_evolution.push(g_displacements[mat_size]);
         pl_sig_ov = sigma_ov.clone();
     }
+    println!("The resolved displacements are: {:?}", g_displacements);
 }
