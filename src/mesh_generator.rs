@@ -1,4 +1,5 @@
 pub use crate::input_parameters;
+use std::collections::HashMap;
 pub fn generate() -> Vec<f64> {
     let b: f64 = input_parameters::OUTER_RADIUS.into();
     let a: f64 = input_parameters::INNER_RADIUS.into();
@@ -15,10 +16,20 @@ pub fn generate() -> Vec<f64> {
     // radial nodes array
     let mut r_node: f64 = a.into();
     let mut radial_nodes: Vec<f64> = vec![r_node];
-    for _ in 0..input_parameters::N_ELEMENTS {
+    for _ in 0..(input_parameters::N_ELEMENTS+1) {
         r_node = r_node + d_r;
         radial_nodes.push(r_node);
         d_r = d_r * q;
     }
     radial_nodes
+}
+
+pub fn generate_connectivity() -> HashMap<u32, (usize, usize)> {
+    let mut connectivity: HashMap<u32, (usize, usize)> = HashMap::new();
+    let limit = input_parameters::N_ELEMENTS;
+    for i in 0..limit {
+        let key = i+1;
+        connectivity.insert(key, (i.try_into().unwrap(),(i+1).try_into().unwrap()));
+    }
+    connectivity
 }

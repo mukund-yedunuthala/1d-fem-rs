@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub use crate::input_parameters::*;
 use ndarray::{prelude::*, Zip};
 use ndarray_linalg::*;
@@ -15,7 +17,7 @@ fn generate_time_span() -> Vec<f64> {
     result
 }
 
-pub fn solver(mat_size: usize, radial_nodes: Vec<f64>) {
+pub fn solver(mat_size: usize, radial_nodes: Vec<f64>, connectivity: HashMap<u32, (usize, usize)>) {
     // Initial variables
     let mut _load_scale: f64;
     let mut load: f64;
@@ -108,6 +110,12 @@ pub fn solver(mat_size: usize, radial_nodes: Vec<f64>) {
                     * b_mat.t().dot(&(tangent_stiffness.dot(&b_mat)));
                 // Assemble
                 sigma_evolution.push(sigma);
+                let c_index = element as u32 + 1;
+                let nodes_tuple = connectivity.get(&c_index).unwrap();
+                let (start, end) = *nodes_tuple;
+                let g_int_slice = &mut g_int_forces.slice_mut(s![start..end+1]);
+                // println!("{:?}",*g_int_slice)
+                *g_int_slice += &e_forces;
             } // End element routine
               // Solver
             let g_forces: Array1<f64> = g_ext_forces - g_int_forces;
